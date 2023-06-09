@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <input type="text" id="content" />
+
+    <input type="text" id="title" />
+
+    <input type="text" id="imageURL" />
+
+    <input type="text" id="publishedBy" />
+
+    <input type="hidden" id="id"  value="-1"/>
+
+
+    <input type="button" value="Save" onclick="saveNews()" />
+    <table id="table">
+
+
+    </table>
+
+
+    <script>
+
+displayData();
+
+function SaveInformation()
+{
+
+
+
+}
+
+
+      
+        function displayData()
+        {
+            fetch("https://63ac1dfa34c46cd7ae77dabf.mockapi.io/api/news").then(y=>y.json()).then(y=> {
+
+let t=  y.map((value,index)=> {
+
+      return(`<tr><td>${value.publishedBy}</td><td>${value.title}</td><td>
+          <button onclick="removeNews(${value.id})">Delete</button></td>
+          <td><button onclick="editItem(${value.id})">Edit</button></td>
+          </tr>`)
+
+
+
+  }).join("");
+
+  document.getElementById("table").innerHTML = t;
+
+
+})
+        }
+
+        function editItem(id)
+        {
+
+            fetch("https://63ac1dfa34c46cd7ae77dabf.mockapi.io/api/news/"+ id)
+            .then(y=>y.json())
+            .then(y=> {
+
+                document.getElementById("id").value = y.id;
+                document.getElementById("title").value = y.title;
+                document.getElementById("content").value = y.content;
+                document.getElementById("imageURL").value = y.imageURL;
+                document.getElementById("publishedBy").value = y.publishedBy;
+
+            })
+
+        }
+
+
+        function removeNews(id)
+        {
+            fetch("https://63ac1dfa34c46cd7ae77dabf.mockapi.io/api/news/"+ id, {
+                method : "DELETE"
+            }).then(y=> {
+                displayData();
+            });
+        }
+
+      
+
+        function saveNews()
+        {
+            let id = document.getElementById("id").value;
+
+            let url = "";
+
+            let method= "";
+
+            let mydata = {
+
+             // Id :  document.getElementById("id").value,
+             Title:  document.getElementById("title").value,
+              Content:  document.getElementById("content").value,
+              imageURL:    document.getElementById("imageURL").value,
+              publishedBy : document.getElementById("publishedBy").value
+
+
+            }
+
+            if(id == -1)
+            {
+                url = "https://63ac1dfa34c46cd7ae77dabf.mockapi.io/api/news";
+                method ="POST"
+            }
+            else
+            {
+
+                url = `https://63ac1dfa34c46cd7ae77dabf.mockapi.io/api/news/${id}`
+                method ="PUT"
+            }
+
+            fetch(url, {
+                method : method,
+                body: JSON.stringify(mydata),
+                headers: {
+        "Content-type": "application/json; charset=UTF-8"
+    }
+            }).then(y=>y.json()).then(y=> {
+                displayData();
+                document.getElementById("id").value= "-1";
+            });
+        }
+
+
+    </script>
+
+    
+</body>
+</html>
